@@ -1,0 +1,31 @@
+services:
+  claw-server:
+    image: alpine:latest
+    container_name: claw-server
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./claw-server:/app/claw-server:ro
+      - ./.env:/app/.env:ro
+    environment:
+      - SERVER_PORT=8080
+      - JWT_SECRET=claw_channel_secret_key_$(openssl rand -hex 16)
+      - ADMIN_PASSWORD=admin123
+      - DATABASE_URL=sqlite:///data/claw.db
+    working_dir: /app
+    command: ./claw-server
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - claw-network
+
+networks:
+  claw-network:
+    driver: bridge

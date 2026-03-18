@@ -1,0 +1,24 @@
+[Unit]
+Description=Claw Channel Server
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/app/working/Claw Channel/Server
+ExecStart=/app/working/Claw Channel/Server/claw-server
+Restart=on-failure
+RestartSec=10
+StandardOutput=append:/app/working/Claw Channel/Server/server.log
+StandardError=append:/app/working/Claw Channel/Server/error.log
+
+# 环境变量
+Environment="SERVER_PORT=8080"
+Environment="JWT_SECRET=your-secret-key-change-in-production"
+Environment="ADMIN_PASSWORD=admin123"
+
+# 资源限制
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target

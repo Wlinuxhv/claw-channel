@@ -1,0 +1,64 @@
+services:
+  # Claw Channel Go 服务端
+  claw-server:
+    build:
+      context: ./Server
+      dockerfile: Dockerfile
+    container_name: claw-server
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    environment:
+      - SERVER_PORT=8080
+      - JWT_SECRET=claw_channel_secret_key_change_in_production
+      - ADMIN_PASSWORD=admin123
+      - DATABASE_URL=sqlite:///data/claw.db
+    networks:
+      - claw-network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # OpenClaw AI 个人助理（可选，如果已有 OpenClaw 实例可注释掉）
+  openclaw:
+    image: wlinuxhv/openclaw:latest
+    container_name: openclaw
+    restart: unless-stopped
+    ports:
+      - "18789:18789"
+    volumes:
+      - ./openclaw-config:/config
+      - ./openclaw-data:/data
+    environment:
+      - OPENCLAW_PORT=18789
+    networks:
+      - claw-network
+    depends_on:
+      - claw-server
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"
+
+networks:
+  claw-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
+
+volumes:
+  data:
+  openclaw-data:

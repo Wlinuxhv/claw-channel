@@ -1,0 +1,118 @@
+# ===========================
+# Android / Gradle
+# ===========================
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# ===========================
+# Kotlin
+# ===========================
+*.kotlin_module
+
+# ===========================
+# Go
+# ===========================
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test`
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Go workspace file
+go.work
+
+# Server binary
+Server/cmd/server/server
+Server/cmd/server/*.exe
+
+# ===========================
+# Database
+# ===========================
+*.db
+*.db-shm
+*.db-wal
+
+# ===========================
+# Environment
+# ===========================
+.env
+.env.local
+.env.*.local
+
+# ===========================
+# Logs
+# ===========================
+logs/
+*.log
+
+# ===========================
+# Temporary files
+# ===========================
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# ===========================
+# macOS
+# ===========================
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# ===========================
+# Windows
+# ===========================
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ===========================
+# Sensitive
+# ===========================
+# Private keys
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Keystore files
+*.jks
+*.keystore
+
+# ===========================
+# Build outputs (keep lightweight)
+# ===========================
+# APK outputs (optional - comment out if you want to track APKs)
+*.apk
+*.aab
+
+# ===========================
+# IDE
+# ===========================
+# VS Code
+.vscode/
+# IntelliJ IDEA
+*.ipr
+*.iws

@@ -1,0 +1,16 @@
+# 简化版 Dockerfile - 只复制已编译的二进制文件
+FROM alpine:latest
+
+RUN apk --no-cache add ca-certificates curl
+
+WORKDIR /app
+
+# 复制编译好的二进制文件
+COPY claw-server .
+COPY .env.example .env
+
+# 暴露端口
+EXPOSE 8080
+
+# 运行
+CMD ["./claw-server"]

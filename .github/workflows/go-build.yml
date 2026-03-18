@@ -1,0 +1,105 @@
+name: 🐹 Go Server Build
+
+on:
+  push:
+    branches: [ "main", "master", "develop" ]
+    paths:
+      - 'Server/**'
+      - '.github/workflows/go-build.yml'
+  pull_request:
+    branches: [ "main", "master", "develop" ]
+    paths:
+      - 'Server/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: 🛠️ Build Go Server
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+      
+      - name: 📋 Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+          cache-dependency-path: Server/go.sum
+      
+      - name: 📦 Download dependencies
+        run: |
+          cd Server
+          go mod download
+      
+      - name: 🔍 Vet
+        run: |
+          cd Server
+          go vet ./...
+      
+      - name: 🧪 Test
+        run: |
+          cd Server
+          go test -v -race -coverprofile=coverage.out ./...
+      
+      - name: 📊 Coverage Report
+        run: |
+          cd Server
+          go tool cover -func=coverage.out
+      
+      - name: 🏗️ Build Linux Binary
+        run: |
+          cd Server
+          GOOS=linux GOARCH=amd64 go build -o server-linux-amd64 -ldflags="-s -w" ./cmd/server
+      
+      - name: 🏗️ Build macOS Binary
+        run: |
+          cd Server
+          GOOS=darwin GOARCH=amd64 go build -o server-darwin-amd64 -ldflags="-s -w" ./cmd/server
+          GOOS=darwin GOARCH=arm64 go build -o server-darwin-arm64 -ldflags="-s -w" ./cmd/server
+      
+      - name: 🏗️ Build Windows Binary
+        run: |
+          cd Server
+          GOOS=windows GOARCH=amd64 go build -o server-windows-amd64.exe -ldflags="-s -w" ./cmd/server
+      
+      - name: 📦 Upload Linux Binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: server-linux-amd64
+          path: Server/server-linux-amd64
+          retention-days: 30
+      
+      - name: 📦 Upload macOS Binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: server-darwin
+          path: |
+            Server/server-darwin-amd64
+            Server/server-darwin-arm64
+          retention-days: 30
+      
+      - name: 📦 Upload Windows Binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: server-windows-amd64
+          path: Server/server-windows-amd64.exe
+          retention-days: 30
+      
+      - name: 📊 Build Summary
+        run: |
+          echo "## 🐹 Go Server Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Build completed successfully!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Build Info" >> $GITHUB_STEP_SUMMARY
+          echo "- Branch: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Go Version: 1.21" >> $GITHUB_STEP_SUMMARY
+          echo "- Build Time: $(date '+%Y-%m-%d %H:%M:%S')" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Binaries" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Linux (amd64)" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ macOS (amd64 + arm64)" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Windows (amd64)" >> $GITHUB_STEP_SUMMARY
