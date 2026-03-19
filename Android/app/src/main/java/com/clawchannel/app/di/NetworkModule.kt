@@ -1,12 +1,10 @@
 package com.clawchannel.app.di
 
-import android.content.Context
 import com.clawchannel.app.data.remote.ApiService
 import com.clawchannel.app.data.remote.WebSocketManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -38,7 +36,7 @@ object NetworkModule {
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("http://192.168.3.90:8080/") // 生产环境应该使用配置文件
+            .baseUrl("http://192.168.3.90:8080/")
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
@@ -53,6 +51,6 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideWebSocketManager(): WebSocketManager {
-        return WebSocketManager("ws://192.168.3.90:8080") // 生产环境应该使用配置文件
+        return WebSocketManager("ws://192.168.3.90:8080")
     }
 }

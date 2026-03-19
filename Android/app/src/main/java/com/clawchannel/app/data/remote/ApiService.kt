@@ -20,8 +20,7 @@ interface ApiService {
     suspend fun adminLogin(@Body request: AdminLoginRequest): Response<ApiResponse<AdminToken>>
     
     @POST("api/admin/recommendation-codes")
-    @Headers("Authorization: Bearer {admin_token}")
-    suspend fun generateRecommendationCode(): Response<ApiResponse<RecommendationCode>>
+    suspend fun generateRecommendationCode(@Header("Authorization") token: String): Response<ApiResponse<RecommendationCode>>
 }
 
 data class LoginRequest(

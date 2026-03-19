@@ -3,9 +3,9 @@ package com.clawchannel.app.ui.chat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.clawchannel.app.data.repository.AuthRepository
+import com.clawchannel.app.data.remote.WebSocketManager.ConnectionState
 import com.clawchannel.app.domain.model.Message
 import com.clawchannel.app.domain.model.MessageStatus
-import com.clawchannel.app.domain.model.MessageType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -91,10 +91,3 @@ class ChatViewModel @Inject constructor(
 data class ChatUiState(
     val connectionState: ConnectionState = ConnectionState.Disconnected
 )
-
-sealed class ConnectionState {
-    object Connecting : ConnectionState()
-    object Connected : ConnectionState()
-    object Disconnected : ConnectionState()
-    data class Error(val message: String) : ConnectionState()
-}

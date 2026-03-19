@@ -59,14 +59,10 @@ android {
         }
     }
 
-    // KSP 配置
-    kotlin {
-        jvmToolchain(17)
-    }
-
     // Kapt 配置
     kapt {
         correctErrorTypes = true
+        useBuildCache = true
     }
 }
 
@@ -102,6 +98,10 @@ dependencies {
     // OkHttp + WebSocket
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+
+    // Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
