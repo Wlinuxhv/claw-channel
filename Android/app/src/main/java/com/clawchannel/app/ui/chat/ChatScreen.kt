@@ -45,17 +45,18 @@ fun ChatScreen(
                     Column {
                         Text("AI 助手")
                         Text(
-                            text = when (uiState.connectionState) {
+                            text = when (val state = uiState.connectionState) {
                                 is ConnectionState.Connected -> "在线"
                                 is ConnectionState.Connecting -> "连接中..."
                                 is ConnectionState.Error -> "已断开"
                                 is ConnectionState.Disconnected -> "未连接"
                             },
                             fontSize = MaterialTheme.typography.bodySmall.fontSize,
-                            color = when (uiState.connectionState) {
+                            color = when (val state = uiState.connectionState) {
                                 is ConnectionState.Connected -> Color(0xFF4CAF50)
+                                is ConnectionState.Connecting -> Color.Gray
                                 is ConnectionState.Error -> Color(0xFFF44336)
-                                else -> Color.Gray
+                                is ConnectionState.Disconnected -> Color.Gray
                             }
                         )
                     }
