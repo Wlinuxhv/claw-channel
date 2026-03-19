@@ -1,0 +1,69 @@
+{
+  "patterns": {
+    "sftp_preferred_over_scp_for_large_files": {
+      "id": "pat-2026-03-19-001",
+      "name": "大文件传输优先使用 SFTP 而非 SCP",
+      "source": "implementation_review",
+      "confidence": 0.95,
+      "applications": 1,
+      "created": "2026-03-19",
+      "last_applied": "2026-03-19",
+      "category": "file_transfer",
+      "pattern": "通过 SSH 远程构建 Android APK 后，下载大文件（>10MB）时应优先使用 SFTP 协议而非 SCP",
+      "problem": "Windows OpenSSH 服务器的 SCP 子系统对大文件传输支持不完善，可能导致文件损坏或传输不完整",
+      "solution": {
+        "preferred_method": "SFTP (paramiko)",
+        "fallback_method": "SCP (仅用于小文件 <5MB)",
+        "implementation": "使用 Python paramiko 库的 SFTP 功能下载文件",
+        "code_example": "python3 -c \"import paramiko; ssh=paramiko.SSHClient(); ssh.connect('IP', username='user', password='pass'); sftp=ssh.open_sftp(); sftp.get('/remote/path', '/local/path'); sftp.close(); ssh.close()\""
+      },
+      "quality_rules": [
+        "文件 >10MB 时必须使用 SFTP",
+        "文件 <5MB 时可尝试 SCP，失败后切换到 SFTP",
+        "传输后必须验证文件大小和校验和"
+      ],
+      "target_skills": ["ssh-win10-android-builder", "ssh-win10-powershell"],
+      "warnings": [
+        "Windows OpenSSH SCP 服务器可能损坏大文件",
+        "Base64 编码传输不适合大文件（命令行缓冲区限制）"
+      ]
+    },
+    "ssh_android_build_workflow": {
+      "id": "pat-2026-03-19-002",
+      "name": "SSH 远程 Android 构建标准工作流",
+      "source": "implementation_review",
+      "confidence": 0.98,
+      "applications": 1,
+      "created": "2026-03-19",
+      "last_applied": "2026-03-19",
+      "category": "build_workflow",
+      "pattern": "通过 SSH 远程构建 Android APK 的标准化 5 步流程",
+      "problem": "需要在容器/Linux 环境中利用远程 Windows 机器的 Android Studio 环境构建 APK",
+      "solution": {
+        "step1": "SSH 测试连接 - 验证远程 Windows 机器可访问",
+        "step2": "SSH 检查环境 - 验证 Java、Android SDK、Gradle Wrapper 存在",
+        "step3": "SSH 远程构建 - 执行 PowerShell 脚本运行 Gradle 构建",
+        "step4": "SSH 验证产物 - 确认 APK 已生成并检查文件大小",
+        "step5": "SFTP 下载 - 使用 paramiko SFTP 下载 APK 到本地"
+      },
+      "quality_rules": [
+        "每步必须有明确的 success/failure 判断",
+        "构建失败时保留日志用于故障排查",
+        "下载后必须验证文件大小与远程一致"
+      ],
+      "target_skills": ["ssh-win10-android-builder"],
+      "metrics": {
+        "expected_build_time": "2-5 分钟",
+        "expected_apk_size": "10-50 MB",
+        "success_rate_target": 0.95
+      }
+    }
+  },
+  "metadata": {
+    "created": "2026-03-19",
+    "last_updated": "2026-03-19T08:42:00Z",
+    "total_patterns": 2,
+    "source_skill": "ssh-win10-android-builder",
+    "learning_session": "ep-2026-03-19-001"
+  }
+}

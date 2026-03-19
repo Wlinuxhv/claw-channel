@@ -1,0 +1,42 @@
+{
+  "id": "ep-2026-03-19-001",
+  "timestamp": "2026-03-19T08:20:00Z",
+  "skill": "ssh-win10-android-builder",
+  "task": "构建 Claw Channel Android APK",
+  "situation": "使用新创建的 ssh-win10-android-builder skill 通过 SSH 远程连接 Windows 10 机器 (192.168.192.151) 构建 Android APK",
+  "outcome": "success",
+  "steps_executed": [
+    "SSH 测试连接 - 成功",
+    "SSH 检查远程环境 - 成功 (Gradle Wrapper 存在)",
+    "SSH 远程执行 Gradle 构建 - 成功",
+    "SSH 验证 APK 生成 - 成功 (14.4 MB)",
+    "SCP 下载 APK - 失败 (文件大小不对，200KB vs 14.4MB)",
+    "SFTP (paramiko) 下载 APK - 成功 (13.71 MB)"
+  ],
+  "what_went_well": [
+    "SSH 连接稳定可靠",
+    "远程环境检测脚本工作正常",
+    "Gradle 构建命令通过 PowerShell 远程执行成功",
+    "APK 验证步骤确认文件正确生成"
+  ],
+  "what_went_wrong": [
+    "SCP 传输大文件失败 - Windows OpenSSH SCP 服务器对大文件传输有限制，传输后文件损坏（200KB vs 14.4MB）",
+    "Base64 编码传输失败 - 命令行方式处理大文件不可靠",
+    "skill 中未提供 SFTP 下载方案"
+  ],
+  "root_cause": "Windows OpenSSH 服务器的 SCP 子系统对大文件传输支持不完善，需要改用 SFTP 协议",
+  "solution": "使用 Python paramiko 库的 SFTP 功能下载 APK 文件，成功传输 14.4 MB 文件",
+  "lesson": "SSH 远程构建流程中，大文件下载应优先使用 SFTP 而非 SCP，需要在 skill 中添加 SFTP 下载方案和故障排除指南",
+  "user_feedback": {
+    "rating": 8,
+    "comments": "构建成功，但 SCP 传输遇到问题，需要优化下载方案"
+  },
+  "related_pattern": "sftp_preferred_over_scp_for_large_files",
+  "metrics": {
+    "total_duration_seconds": 180,
+    "ssh_connection_attempts": 1,
+    "build_attempts": 1,
+    "download_attempts": 3,
+    "final_file_size_bytes": 14375089
+  }
+}
