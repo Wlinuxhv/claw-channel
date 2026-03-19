@@ -62,9 +62,13 @@ fun LoginScreen(
             )
             
             // Recommendation Code Input
+            var code by remember { mutableStateOf(uiState.recommendationCode) }
             OutlinedTextField(
-                value = uiState.recommendationCode,
-                onValueChange = { viewModel.onRecommendationCodeChange(it) },
+                value = code,
+                onValueChange = { newCode ->
+                    code = newCode
+                    viewModel.onRecommendationCodeChange(newCode)
+                },
                 label = { Text(text = "推荐码") },
                 placeholder = { Text(text = "请输入 8 位推荐码") },
                 singleLine = true,
