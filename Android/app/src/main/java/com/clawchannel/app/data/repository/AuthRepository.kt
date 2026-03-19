@@ -4,16 +4,10 @@ import com.clawchannel.app.data.remote.ApiService
 import com.clawchannel.app.data.remote.LoginRequest
 import com.clawchannel.app.data.remote.WebSocketManager
 import com.clawchannel.app.domain.model.AuthTokens
-import com.clawchannel.app.domain.model.Message
-import com.clawchannel.app.domain.model.MessageStatus
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class AuthRepository @Inject constructor(
+class AuthRepository(
     private val apiService: ApiService,
     private val webSocketManager: WebSocketManager
 ) {
@@ -30,10 +24,7 @@ class AuthRepository @Inject constructor(
                 val tokens = response.body()!!.data!!
                 currentTokens = tokens
                 _authState.value = AuthState.Authenticated(tokens)
-                
-                // 连接 WebSocket
                 webSocketManager.connect(tokens.accessToken)
-                
                 Result.success(tokens)
             } else {
                 Result.failure(Exception(response.body()?.message ?: "Login failed"))

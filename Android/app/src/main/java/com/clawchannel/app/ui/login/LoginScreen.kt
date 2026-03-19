@@ -8,16 +8,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun LoginScreen(
     onLoginSuccess: () -> Unit,
-    viewModel: LoginViewModel = hiltViewModel()
+    viewModel: LoginViewModel = viewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val navigateToChat by viewModel.navigateToChat.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsState()
+    val navigateToChat by viewModel.navigateToChat.collectAsState()
     var code by remember { mutableStateOf("") }
     
     LaunchedEffect(navigateToChat) {

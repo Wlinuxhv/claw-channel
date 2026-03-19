@@ -16,9 +16,7 @@ import androidx.navigation.compose.rememberNavController
 import com.clawchannel.app.ui.chat.ChatScreen
 import com.clawchannel.app.ui.login.LoginScreen
 import com.clawchannel.app.ui.theme.LobsterRed
-import dagger.hilt.android.AndroidEntryPoint
 
-@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
