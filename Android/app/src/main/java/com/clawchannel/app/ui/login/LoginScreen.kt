@@ -12,7 +12,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.clawchannel.app.data.remote.WebSocketManager.ConnectionState
 
 @Composable
 fun LoginScreen(
@@ -65,9 +64,9 @@ fun LoginScreen(
             // Recommendation Code Input
             OutlinedTextField(
                 value = uiState.recommendationCode,
-                onValueChange = viewModel::onRecommendationCodeChange,
-                label = { Text("推荐码") },
-                placeholder = { Text("请输入 8 位推荐码") },
+                onValueChange = { viewModel.onRecommendationCodeChange(it) },
+                label = { Text(text = "推荐码") },
+                placeholder = { Text(text = "请输入 8 位推荐码") },
                 singleLine = true,
                 maxLength = 8,
                 modifier = Modifier
