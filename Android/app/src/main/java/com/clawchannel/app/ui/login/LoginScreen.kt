@@ -1,12 +1,10 @@
 package com.clawchannel.app.ui.login
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -20,6 +18,7 @@ fun LoginScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val navigateToChat by viewModel.navigateToChat.collectAsStateWithLifecycle()
+    var code by remember { mutableStateOf("") }
     
     LaunchedEffect(navigateToChat) {
         if (navigateToChat) {
@@ -39,14 +38,12 @@ fun LoginScreen(
             verticalArrangement = Arrangement.Center,
             modifier = Modifier.fillMaxWidth()
         ) {
-            // Logo
             Text(
                 text = "🦞",
                 fontSize = 80.sp,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
             
-            // Title
             Text(
                 text = "Claw Channel",
                 fontSize = 32.sp,
@@ -61,8 +58,6 @@ fun LoginScreen(
                 modifier = Modifier.padding(bottom = 48.dp)
             )
             
-            // Recommendation Code Input
-            var code by remember { mutableStateOf("") }
             TextField(
                 value = code,
                 onValueChange = { newCode: String ->
@@ -72,14 +67,11 @@ fun LoginScreen(
                 label = { Text("推荐码") },
                 placeholder = { Text("请输入 8 位推荐码") },
                 singleLine = true,
-                maxLength = 8,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                isError = uiState.error != null
+                    .padding(bottom = 16.dp)
             )
             
-            // Error Message
             if (uiState.error != null) {
                 Text(
                     text = uiState.error!!,
@@ -89,10 +81,9 @@ fun LoginScreen(
                 )
             }
             
-            // Login Button
             Button(
-                onClick = viewModel::login,
-                enabled = !uiState.isLoading,
+                onClick = { viewModel.login() },
+                enabled = !uiState.isLoading && code.length == 8,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp)
@@ -110,7 +101,6 @@ fun LoginScreen(
                 }
             }
             
-            // Footer
             Spacer(modifier = Modifier.height(24.dp))
             
             Text(
