@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.clawchannel.app.data.remote.WebSocketManager.ConnectionState
 import com.clawchannel.app.domain.model.Message
 import com.clawchannel.app.domain.model.MessageStatus
 
