@@ -2,7 +2,7 @@ plugins {
     id("com.android.application") version "8.2.0"
     id("org.jetbrains.kotlin.android") version "1.9.22"
     id("com.google.dagger.hilt.android") version "2.48.1"
-    id("com.google.devtools.ksp") version "1.9.22-1.0.17"
+    id("kotlin-kapt")
 }
 
 android {
@@ -58,6 +58,16 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
+    // KSP 配置
+    kotlin {
+        jvmToolchain(17)
+    }
+
+    // Kapt 配置
+    kapt {
+        correctErrorTypes = true
+    }
 }
 
 dependencies {
@@ -81,13 +91,13 @@ dependencies {
 
     // Hilt
     implementation("com.google.dagger:hilt-android:2.48.1")
-    ksp("com.google.dagger:hilt-android-compiler:2.48.1")
+    kapt("com.google.dagger:hilt-android-compiler:2.48.1")
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
 
     // Room Database
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
-    ksp("androidx.room:room-compiler:2.6.1")
+    kapt("androidx.room:room-compiler:2.6.1")
 
     // OkHttp + WebSocket
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
