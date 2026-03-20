@@ -14,5 +14,8 @@ dependencyResolutionManagement {
     }
 }
 
+// Disable JDK image transform for AGP 8.x with JDK 21
+gradle.ext.androidEnableJdkImageTransform = false
+
 rootProject.name = "ClawChannel"
 include ':app'

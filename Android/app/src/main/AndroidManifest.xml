@@ -18,6 +18,9 @@
     
     <!-- 录音权限（用于语音消息） -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    
+    <!-- 通知权限（Android 13+） -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:name=".ClawChannelApplication"

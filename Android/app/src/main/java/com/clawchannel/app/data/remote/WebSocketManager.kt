@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.StateFlow
 import okhttp3.*
 import java.util.concurrent.TimeUnit
 
-class WebSocketManager(private val baseUrl: String) {
+class WebSocketManager(private val baseUrl: String = "ws://192.168.3.90:8080") {
     
     private var webSocket: WebSocket? = null
     private val client = OkHttpClient.Builder()

@@ -9,11 +9,11 @@ data class User(
 
 data class Message(
     val id: Long = 0,
-    val userId: Long = 0,
+    val sessionId: String = "",
     val content: String = "",
     val type: MessageType = MessageType.TEXT,
     val status: MessageStatus = MessageStatus.SENDING,
-    val isFromAI: Boolean = false,
+    val isFromMe: Boolean = true,  // true = 我发送的，false = AI 回复的
     val timestamp: Long = System.currentTimeMillis(),
     val filePath: String? = null,
     val fileSize: Long? = null
@@ -43,6 +43,6 @@ data class AuthTokens(
 data class RecommendationCode(
     val id: Long = 0,
     val code: String = "",
-    val isUsed: Boolean = false,
-    val createdAt: Long = 0
+    val isUsed: Boolean = false,  // 改名以符合 Kotlin 命名规范
+    val createdAt: Long = 0  // 改为 Long 类型（时间戳）
 )

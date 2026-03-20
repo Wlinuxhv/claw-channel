@@ -1,93 +1,143 @@
 package com.clawchannel.app.ui.chat
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.clawchannel.app.data.repository.AuthRepository
+import com.clawchannel.app.data.remote.WebSocketManager
 import com.clawchannel.app.data.remote.WebSocketManager.ConnectionState
+import com.clawchannel.app.data.repository.MessageRepository
 import com.clawchannel.app.domain.model.Message
 import com.clawchannel.app.domain.model.MessageStatus
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.clawchannel.app.domain.model.MessageType
+import com.clawchannel.app.util.NotificationHelper
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class ChatViewModel @Inject constructor(
-    private val authRepository: AuthRepository
-) : ViewModel() {
+class ChatViewModel(
+    application: Application,
+    private val messageRepository: MessageRepository,
+    private val webSocketManager: WebSocketManager
+) : AndroidViewModel(application) {
     
     private val _uiState = MutableStateFlow(ChatUiState())
     val uiState: StateFlow<ChatUiState> = _uiState
     
-    private val _messages = MutableStateFlow<List<Message>>(emptyList())
-    val messages: StateFlow<List<Message>> = _messages
+    // 从 Repository 获取消息（Flow）
+    val messages = messageRepository.messages
     
     init {
-        observeMessages()
         observeConnection()
-    }
-    
-    private fun observeMessages() {
-        viewModelScope.launch {
-            authRepository.messages.collect { rawMessages ->
-                // 将原始消息转换为 Message 对象
-                val newMessages = rawMessages.mapIndexed { index, msg ->
-                    Message(
-                        id = index.toLong(),
-                        content = msg,
-                        isFromAI = true,
-                        status = MessageStatus.DELIVERED
-                    )
-                }
-                _messages.value = newMessages
-            }
-        }
     }
     
     private fun observeConnection() {
         viewModelScope.launch {
-            authRepository.connectionState.collect { state ->
+            webSocketManager.connectionState.collect { state ->
                 _uiState.value = _uiState.value.copy(connectionState = state)
             }
         }
     }
     
+    /**
+     * 发送文本消息
+     */
     fun sendMessage(content: String) {
         if (content.isBlank()) return
         
-        // 添加用户消息到列表
-        val userMessage = Message(
-            id = System.currentTimeMillis(),
-            content = content,
-            isFromAI = false,
-            status = MessageStatus.SENDING
-        )
-        
-        val currentMessages = _messages.value.toMutableList()
-        currentMessages.add(userMessage)
-        _messages.value = currentMessages
-        
-        // 通过 WebSocket 发送
-        authRepository.sendMessage(content)
-        
-        // 更新状态为已发送
         viewModelScope.launch {
-            kotlinx.coroutines.delay(500)
-            val updatedMessages = _messages.value.toMutableList()
-            val index = updatedMessages.indexOfFirst { it.id == userMessage.id }
-            if (index != -1) {
-                updatedMessages[index] = userMessage.copy(status = MessageStatus.SENT)
-                _messages.value = updatedMessages
+            try {
+                messageRepository.sendMessage(content)
+            } catch (e: Exception) {
+                // 发送失败，更新状态
+                _uiState.value = _uiState.value.copy(errorMessage = e.message)
             }
         }
     }
     
+    /**
+     * 发送图片消息
+     */
+    fun sendImageMessage(filePath: String, fileSize: Long) {
+        viewModelScope.launch {
+            try {
+                messageRepository.sendImageMessage(filePath, fileSize)
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(errorMessage = e.message)
+            }
+        }
+    }
+    
+    /**
+     * 发送文件消息
+     */
+    fun sendFileMessage(filePath: String, fileName: String, fileSize: Long) {
+        viewModelScope.launch {
+            try {
+                messageRepository.sendFileMessage(filePath, fileName, fileSize)
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(errorMessage = e.message)
+            }
+        }
+    }
+    
+    /**
+     * 接收来自 AI 的消息
+     */
+    fun receiveMessage(content: String, type: MessageType = MessageType.TEXT) {
+        viewModelScope.launch {
+            messageRepository.receiveMessage(content, type)
+            
+            // 显示通知（如果应用不在前台）
+            // 注意：实际应用中需要检测应用是否在前台
+            // 这里简化处理，每次收到消息都显示通知
+            // showNotification(content)
+        }
+    }
+    
+    /**
+     * 显示消息通知
+     */
+    private fun showNotification(message: String) {
+        try {
+            val context = getApplication<Application>().applicationContext
+            NotificationHelper.showMessageNotification(
+                context = context,
+                messageId = System.currentTimeMillis().toInt(),
+                title = "🦞 AI 助手",
+                message = message
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+    
+    /**
+     * 重发消息
+     */
+    fun resendMessage(messageId: Long) {
+        viewModelScope.launch {
+            messageRepository.resendMessage(messageId)
+        }
+    }
+    
+    /**
+     * 清除所有消息
+     */
+    fun clearMessages() {
+        viewModelScope.launch {
+            messageRepository.clearAllMessages()
+        }
+    }
+    
+    /**
+     * 退出登录
+     */
     fun logout() {
-        authRepository.logout()
+        webSocketManager.disconnect()
     }
 }
 
 data class ChatUiState(
-    val connectionState: ConnectionState = ConnectionState.Disconnected
+    val connectionState: ConnectionState = ConnectionState.Disconnected,
+    val errorMessage: String? = null
 )
